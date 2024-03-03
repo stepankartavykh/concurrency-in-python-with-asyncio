@@ -1,25 +1,33 @@
 import asyncio
+import random
 
 
-async def simple_task():
+def some_cpu_bound_task():
+    sum(i ** 2 for i in range(100000))
+
+
+async def first_simple_task():
+    print('first_simple_task')
+    await asyncio.sleep(1)
+
+
+async def second_simple_task():
+    print('second_simple_task')
     await asyncio.sleep(1)
 
 
 async def start_async_processing() -> None:
-    added_links = set()
+    links = set()
 
-    async def run_process(incoming_url: str) -> None:
-        # handler = PageHandler(incoming_url)
-        await handler.make_async_request()
-        handler.get_all_links_from_page()
-        message = handler.make_content_analysis()
-        bot_message = form_message_for_bot(message)
-        await update.message.reply_text(bot_message)
-        for link in handler.links:
-            if link not in added_links:
-                added_links.add(link)
-                # await update.message.reply_text(f'{link}')
-                await run_process(link)
+    async def run_process() -> None:
+        await first_simple_task()
+        some_cpu_bound_task()
+        await second_simple_task()
+        random_links = [random.randint(1, 100) for _ in range(10)]
+        for link in random_links:
+            if link not in links:
+                links.add(link)
+                await run_process()
     for source in sources:
         await run_process(source)
 
