@@ -22,6 +22,7 @@ async def query_product(pool):
     async with pool.acquire() as connection:
         return await connection.fetchrow(product_query)
 
+
 @async_timed()
 async def query_products_synchronously(pool, queries):
     return [await query_product(pool) for _ in range(queries)]

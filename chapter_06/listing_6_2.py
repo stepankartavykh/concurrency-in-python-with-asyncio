@@ -1,3 +1,4 @@
+import multiprocessing
 from multiprocessing import Pool
 
 
@@ -11,3 +12,5 @@ if __name__ == "__main__":
         hi_john = process_pool.apply(say_hello, args=('John',))
         print(hi_jeff)
         print(hi_john)
+
+    print(multiprocessing.cpu_count())
