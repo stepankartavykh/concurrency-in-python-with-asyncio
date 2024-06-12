@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  postgres-source:
+    image: postgres:14.1
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - postgres-source-data:/var/lib/postgresql/data
+
+  postgres:
+    image: postgres:14.1
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5333:5432"
+    depends_on:
+      - postgres-source
+    command: >
+      sh -c "
+        while ! pg_isready -h postgres-source -U postgres; do
+          echo 'Waiting for postgres-source to be ready...'
+          sleep 1;
+        done;
+        echo 'postgres-source is ready!';
+        pg_dump -h postgres-source -U postgres -d postgres > /tmp/dump.sql;
+        psql -U postgres -d postgres < /tmp/dump.sql;
+        rm /tmp/dump.sql;
+        /usr/local/bin/docker-entrypoint.sh postgres"
+
+  redis:
+    image: redis:7.0.5
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6300:6379"
+
+  rabbitmq:
+    image: rabbitmq:3.11.5-management
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - "5600:5672"
+      - "5601:15672"
+
+volumes:
+  postgres-source-data:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:

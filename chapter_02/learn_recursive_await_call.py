@@ -1,5 +1,6 @@
 import asyncio
 import random
+import threading
 
 
 def some_cpu_bound_task():
@@ -7,6 +8,7 @@ def some_cpu_bound_task():
 
 
 async def first_simple_task():
+    print(threading.active_count())
     print('first_simple_task')
     await asyncio.sleep(1)
 
@@ -18,6 +20,7 @@ async def second_simple_task():
 
 async def start_async_processing() -> None:
     links = set()
+    print(threading.active_count())
 
     async def run_process() -> None:
         await first_simple_task()
@@ -28,9 +31,12 @@ async def start_async_processing() -> None:
             if link not in links:
                 links.add(link)
                 await run_process()
-    for source in sources:
-        await run_process(source)
+
+    await run_process()
 
 
 if __name__ == '__main__':
+    print(threading.active_count())
+    current_thread = threading.current_thread()
+    print(current_thread.name)
     asyncio.run(start_async_processing())
