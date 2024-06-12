@@ -7,6 +7,9 @@ async def main():
     print(f'Process pid is: {process.pid}')
     status_code = await process.wait()
     print(f'Status code: {status_code}')
+    process: Process = await asyncio.create_subprocess_exec('history')
+    status_code = await process.wait()
+    print(f'Status code: {status_code}')
 
 
 asyncio.run(main())

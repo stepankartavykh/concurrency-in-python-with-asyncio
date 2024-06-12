@@ -1,8 +1,11 @@
+import os
 import time
+import multiprocessing
 from multiprocessing import Process
 
 
 def count(count_to: int) -> int:
+    print(os.getpid())
     start = time.time()
     counter = 0
     while counter < count_to:
@@ -13,16 +16,22 @@ def count(count_to: int) -> int:
 
 
 if __name__ == "__main__":
+    print(multiprocessing.cpu_count())
     start_time = time.time()
 
-    to_one_hundred_million = Process(target=count, args=(100000000,))
-    to_two_hundred_million = Process(target=count, args=(200000000,))
+    first_process = Process(target=count, args=(50000000,))
+    second_process = Process(target=count, args=(2000000,))
+    third_process = Process(target=count, args=(2000000,))
 
-    to_one_hundred_million.start()
-    to_two_hundred_million.start()
+    first_process.start()
+    print('1')
+    second_process.start()
+    print('2')
+    third_process.start()
 
-    to_one_hundred_million.join()
-    to_two_hundred_million.join()
+    first_process.join()
+    second_process.join()
+    third_process.join()
 
     end_time = time.time()
     print(f'Completed in {end_time-start_time}')

@@ -1,11 +1,11 @@
-from threading import Thread
 import socket
+import threading
 
 
 def echo(client: socket):
     while True:
         data = client.recv(2048)
-        print(f'Received {data}, sending!')
+        print(f'Received {data}, sending! Data from thread number {threading.current_thread().name}')
         client.sendall(data)
 
 
@@ -15,5 +15,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
     server.listen()
     while True:
         connection, _ = server.accept()  # A
-        thread = Thread(target=echo, args=(connection,))  # B
+        thread = threading.Thread(target=echo, args=(connection,), name=f"{threading.active_count() + 1}")  # B
+        thread.daemon = True
         thread.start()  # C
