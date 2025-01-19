@@ -1,25 +1,23 @@
-import asyncio
 import aiohttp
-from chapter_04 import fetch_status
+import asyncio
+from aiohttp import ClientSession
 from util import async_timed
 
 
-@async_timed()
+async def fetch_status(session: ClientSession,
+                       url: str,
+                       delay: int = 0) -> int:
+    await asyncio.sleep(delay)
+    async with session.get(url) as result:
+        return result.status
+
+
 async def main():
     async with aiohttp.ClientSession() as session:
-        url = 'https://example.com'
-        fetchers = [asyncio.create_task(fetch_status(session, url)),
-                    asyncio.create_task(fetch_status(session, url)),
-                    asyncio.create_task(fetch_status(session, url, delay=3))]
+        url = 'http://1gvp01.int.aorti.tech/goz-sg/distribution-plan-analysis?planVariantId=5001&startDate=2024-08-29&endDate=2024-09-05'
+        fetchers = [asyncio.create_task(fetch_status(session, url)) for _ in range(100)]
 
-        done, pending = await asyncio.wait(fetchers, timeout=1)
-
-        print(f'Done task count: {len(done)}')
-        print(f'Pending task count: {len(pending)}')
-
-        for done_task in done:
-            result = await done_task
-            print(result)
+        await asyncio.gather(*fetchers)
 
 
 asyncio.run(main())
